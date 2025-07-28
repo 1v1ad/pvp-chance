@@ -17,18 +17,15 @@ export default async function handler(req, res) {
     const data = await tokenRes.json();
 
     if (data.error) {
-      return res.status(400).send(`VK error: ${data.error_description}`);
+      return res.status(400).send(\`VK error: \${data.error_description}\`);
     }
 
-    const { user_id, access_token } = data;
+    const { user_id } = data;
 
-    // Пример сохранения user_id в cookie (свою авторизацию можешь доработать позже)
-    res.setHeader(
-      'Set-Cookie',
-      `vk_user_id=${user_id}; Path=/; HttpOnly; Secure; SameSite=Lax`
-    );
+    // Установим cookie на 7 дней
+    res.setHeader('Set-Cookie', \`vk_user_id=\${user_id}; Max-Age=604800; Path=/; HttpOnly; SameSite=Lax\`);
 
-    // Перенаправление в лобби
+    // Редирект в лобби
     return res.redirect(302, '/lobby');
   } catch (err) {
     console.error('VK callback error:', err);
