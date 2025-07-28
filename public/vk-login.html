@@ -2,22 +2,52 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Вход через VK</title>
-    <script src="https://vk.com/js/api/openapi.js?169"></script>
+    <title>VK One Tap</title>
+    <script src="https://unpkg.com/@vkid/sdk@2.18.1/dist-sdk/umd/index.js"></script>
   </head>
   <body>
     <h2>Вход через VK One Tap</h2>
-    <div id="vk_auth"></div>
+    <div id="vkid-container"></div>
 
     <script type="text/javascript">
-      window.vkAsyncInit = function () {
-        VK.init({
-          apiId: 53969710
+      if ('VKIDSDK' in window) {
+        const VKID = window.VKIDSDK;
+
+        VKID.Config.init({
+          app: 53969710,
+          redirectUrl: 'https://pvp-chance.vercel.app/api/vk/callback',
+          responseMode: VKID.ConfigResponseMode.Callback,
+          source: VKID.ConfigSource.LOWCODE,
+          scope: '', // если нужно — добавим email и т.д.
         });
-        VK.Widgets.Auth("vk_auth", {
-          authUrl: "https://pvp-chance.vercel.app/api/vk/callback"
-        });
-      };
+
+        const oneTap = new VKID.OneTap();
+
+        oneTap
+          .render({
+            container: document.getElementById('vkid-container'),
+            showAlternativeLogin: true,
+            oauthList: ['mail_ru'], // или убери если не нужно
+          })
+          .on(VKID.WidgetEvents.ERROR, vkidOnError)
+          .on(VKID.OneTapInternalEvents.LOGIN_SUCCESS, function (payload) {
+            const code = payload.code;
+            const deviceId = payload.device_id;
+
+            VKID.Auth.exchangeCode(code, deviceId)
+              .then(vkidOnSuccess)
+              .catch(vkidOnError);
+          });
+
+        function vkidOnSuccess(data) {
+          console.log("VKID Success:", data);
+          // тут мы отправим JWT или ID на backend, сохраним сессию и т.п.
+        }
+
+        function vkidOnError(error) {
+          console.error("VKID Error:", error);
+        }
+      }
     </script>
   </body>
 </html>
