@@ -1,53 +1,58 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>VK One Tap</title>
-    <script src="https://unpkg.com/@vkid/sdk@2.18.1/dist-sdk/umd/index.js"></script>
-  </head>
-  <body>
-    <h2>Вход через VK One Tap</h2>
-    <div id="vkid-container"></div>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Вход через VK One Tap</title>
+  <script src="https://unpkg.com/@vkid/sdk@2.18.1/dist-sdk/umd/index.js"></script>
+</head>
+<body>
+  <h2>Вход через VK One Tap</h2>
+  <div id="vkid-container"></div>
 
-    <script type="text/javascript">
-      if ('VKIDSDK' in window) {
-        const VKID = window.VKIDSDK;
+  <script type="text/javascript">
+    window.addEventListener('DOMContentLoaded', function () {
+      if (!window.VKIDSDK) {
+        console.error('VKIDSDK не загружен');
+        return;
+      }
 
-        VKID.Config.init({
-          app: 53969710,
-          redirectUrl: 'https://pvp-chance.vercel.app/api/vk/callback',
-          responseMode: VKID.ConfigResponseMode.Callback,
-          source: VKID.ConfigSource.LOWCODE,
-          scope: '', // если нужно — добавим email и т.д.
+      const VKID = window.VKIDSDK;
+
+      VKID.Config.init({
+        app: 53969710,
+        redirectUrl: 'https://pvp-chance.vercel.app/api/vk/callback',
+        responseMode: VKID.ConfigResponseMode.Callback,
+        source: VKID.ConfigSource.LOWCODE,
+        scope: ''
+      });
+
+      const oneTap = new VKID.OneTap();
+
+      oneTap
+        .render({
+          container: document.getElementById('vkid-container'),
+          showAlternativeLogin: true,
+          oauthList: ['mail_ru'] // можно убрать, если не нужно
+        })
+        .on(VKID.WidgetEvents.ERROR, vkidOnError)
+        .on(VKID.OneTapInternalEvents.LOGIN_SUCCESS, function (payload) {
+          const { code, device_id } = payload;
+
+          VKID.Auth.exchangeCode(code, device_id)
+            .then(vkidOnSuccess)
+            .catch(vkidOnError);
         });
 
-        const oneTap = new VKID.OneTap();
-
-        oneTap
-          .render({
-            container: document.getElementById('vkid-container'),
-            showAlternativeLogin: true,
-            oauthList: ['mail_ru'], // или убери если не нужно
-          })
-          .on(VKID.WidgetEvents.ERROR, vkidOnError)
-          .on(VKID.OneTapInternalEvents.LOGIN_SUCCESS, function (payload) {
-            const code = payload.code;
-            const deviceId = payload.device_id;
-
-            VKID.Auth.exchangeCode(code, deviceId)
-              .then(vkidOnSuccess)
-              .catch(vkidOnError);
-          });
-
-        function vkidOnSuccess(data) {
-          console.log("VKID Success:", data);
-          // тут мы отправим JWT или ID на backend, сохраним сессию и т.п.
-        }
-
-        function vkidOnError(error) {
-          console.error("VKID Error:", error);
-        }
+      function vkidOnSuccess(data) {
+        console.log('Успешная авторизация:', data);
+        alert('Успешный вход! Смотрите консоль.');
       }
-    </script>
-  </body>
+
+      function vkidOnError(error) {
+        console.error('Ошибка авторизации:', error);
+        alert('Ошибка входа. Смотрите консоль.');
+      }
+    });
+  </script>
+</body>
 </html>
