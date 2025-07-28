@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   const code = req.query.code;
 
   if (!code) {
-    return res.status(400).json({ error: "No code provided" });
+    return res.status(400).send("No code provided");
   }
 
   const params = new URLSearchParams({
@@ -12,12 +12,26 @@ export default async function handler(req, res) {
     code
   });
 
-  const tokenRes = await fetch(`https://oauth.vk.com/access_token?${params}`);
-  const data = await tokenRes.json();
+  try {
+    const tokenRes = await fetch(`https://oauth.vk.com/access_token?${params}`);
+    const data = await tokenRes.json();
 
-  if (data.error) {
-    return res.status(400).json({ error: data.error_description });
+    if (data.error) {
+      return res.status(400).send(`VK error: ${data.error_description}`);
+    }
+
+    const { user_id, access_token } = data;
+
+    // Пример сохранения user_id в cookie (свою авторизацию можешь доработать позже)
+    res.setHeader(
+      'Set-Cookie',
+      `vk_user_id=${user_id}; Path=/; HttpOnly; Secure; SameSite=Lax`
+    );
+
+    // Перенаправление в лобби
+    return res.redirect(302, '/lobby');
+  } catch (err) {
+    console.error('VK callback error:', err);
+    return res.status(500).send('Internal server error');
   }
-
-  return res.status(200).json({ user: data });
 }
