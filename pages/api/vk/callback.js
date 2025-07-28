@@ -6,9 +6,9 @@ export default async function handler(req, res) {
   }
 
   const params = new URLSearchParams({
-    client_id: process.env.VK_CLIENT_ID,
-    client_secret: process.env.VK_CLIENT_SECRET,
-    redirect_uri: process.env.VK_REDIRECT_URI,
+    client_id: "53969710",
+    client_secret: "eRgb6bTJPom62dvQTXtE",
+    redirect_uri: "https://pvp-chance.vercel.app/api/vk/callback",
     code
   });
 
@@ -17,19 +17,16 @@ export default async function handler(req, res) {
     const data = await tokenRes.json();
 
     if (data.error) {
-      return res.status(400).send('VK error: ' + data.error_description);
+      return res.status(400).send("VK error: " + data.error_description);
     }
 
     const { user_id } = data;
 
-    const cookie = `vk_user_id=${user_id}; Max-Age=604800; Path=/; SameSite=Lax`;
-    res.setHeader('Set-Cookie', cookie);
-
-    console.log('Set-Cookie:', cookie); // DEBUG
+    // Устанавливаем cookie без expires, только Max-Age
+    res.setHeader('Set-Cookie', `vk_user_id=${user_id}; Max-Age=604800; Path=/; SameSite=Lax`);
 
     return res.redirect(302, '/lobby');
   } catch (err) {
-    console.error('VK callback error:', err);
-    return res.status(500).send('Internal server error');
+    return res.status(500).send('Internal error');
   }
 }
