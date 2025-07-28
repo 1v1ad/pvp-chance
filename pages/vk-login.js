@@ -1,31 +1,10 @@
-import { useEffect } from 'react';
-
 export default function VkLogin() {
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://unpkg.com/@vkid/sdk/dist-sdk/umd/index.js';
-    script.onload = () => {
-      const VKID = window.VKIDSDK;
-      VKID.Config.init({
-        app: 53969710,
-        redirectUrl: 'https://pvp-chance.vercel.app/api/vk/callback',
-        responseMode: VKID.ConfigResponseMode.Redirect, // строго через redirect
-        source: VKID.ConfigSource.LOWCODE
-      });
-
-      const oneTap = new VKID.OneTap();
-      oneTap.render({
-        container: document.getElementById('vkid-container'),
-        showAlternativeLogin: true
-      });
-    };
-    document.body.appendChild(script);
-  }, []);
-
   return (
     <div>
-      <h2>Вход через VK One Tap</h2>
-      <div id="vkid-container" />
+      <h2>Вход через VK OAuth</h2>
+      <a href="https://oauth.vk.com/authorize?client_id=53969710&display=page&redirect_uri=https://pvp-chance.vercel.app/api/vk/callback&response_type=code&v=5.131">
+        <button>Войти через VK</button>
+      </a>
     </div>
   );
 }
