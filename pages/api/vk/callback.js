@@ -22,10 +22,11 @@ export default async function handler(req, res) {
 
     const { user_id } = data;
 
-    // cookie на 7 дней
-    res.setHeader('Set-Cookie', `vk_user_id=${user_id}; Max-Age=604800; Path=/; HttpOnly; SameSite=Lax`);
+    // ❗ Устанавливаем куку правильно: только Max-Age
+    res.setHeader('Set-Cookie', [
+      `vk_user_id=${user_id}; Max-Age=604800; Path=/; SameSite=Lax`
+    ]);
 
-    // редирект в лобби
     return res.redirect(302, '/lobby');
   } catch (err) {
     console.error('VK callback error:', err);
