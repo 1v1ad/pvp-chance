@@ -1,24 +1,24 @@
-import { useSession, signIn, signOut } from "next-auth/react";
+
+import { signIn, signOut, useSession } from "next-auth/react";
 
 export default function Home() {
   const { data: session } = useSession();
 
+  if (session) {
+    return (
+      <>
+        <h1>PvP Chance</h1>
+        <p>Привет, {session.user.name}</p>
+        <button onClick={() => signOut()}>Выйти</button>
+      </>
+    );
+  }
+
   return (
-    <main style={{ textAlign: 'center', padding: '2rem' }}>
+    <>
       <h1>PvP Chance</h1>
-      {!session ? (
-        <>
-          <p>Вы не вошли</p>
-          <button onClick={() => signIn("vk")}>Войти через VK</button>
-        </>
-      ) : (
-        <>
-          <p>Вы вошли как {session.user.name}</p>
-          {session.user.image && <img src={session.user.image} alt="avatar" width={64} height={64} />}
-          <br />
-          <button onClick={() => signOut()}>Выйти</button>
-        </>
-      )}
-    </main>
+      <p>Вы не вошли</p>
+      <button onClick={() => signIn("vk")}>Войти через VK</button>
+    </>
   );
 }
