@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   const code = req.query.code;
 
   if (!code) {
-    return res.status(400).json({ error: "No code provided" });
+    return res.status(400).send("No code provided");
   }
 
   const params = new URLSearchParams({
@@ -17,17 +17,15 @@ export default async function handler(req, res) {
     const data = await tokenRes.json();
 
     if (data.error) {
-      return res.status(400).json({ error: data.error_description });
+      return res.status(400).send("VK error: " + data.error_description);
     }
 
     const { user_id } = data;
 
-    const cookie = `vk_user_id=${user_id}; Max-Age=604800; Path=/; SameSite=Lax`;
-    res.setHeader('Set-Cookie', cookie);
-
-    // 👉 вместо редиректа — отладка
-    return res.status(200).json({ success: true, user_id, cookie });
+    res.setHeader('Set-Cookie', `vk_user_id=${user_id}; Max-Age=604800; Path=/; HttpOnly; SameSite=Lax`);
+    return res.redirect(302, '/lobby');
   } catch (err) {
-    return res.status(500).json({ error: "Internal error", detail: err });
+    console.error('VK callback error:', err);
+    return res.status(500).send('Internal error');
   }
 }

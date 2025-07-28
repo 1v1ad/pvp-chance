@@ -5,22 +5,18 @@ export default function VkLogin() {
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/@vkid/sdk/dist-sdk/umd/index.js';
     script.onload = () => {
-      if (!window.VKIDSDK) return;
       const VKID = window.VKIDSDK;
       VKID.Config.init({
         app: 53969710,
         redirectUrl: 'https://pvp-chance.vercel.app/api/vk/callback',
-        responseMode: VKID.ConfigResponseMode.Callback,
+        responseMode: VKID.ConfigResponseMode.Redirect, // строго через redirect
         source: VKID.ConfigSource.LOWCODE
       });
 
       const oneTap = new VKID.OneTap();
       oneTap.render({
         container: document.getElementById('vkid-container'),
-        showAlternativeLogin: true,
-        onAuth: (user) => {
-          console.log('VK One Tap auth', user);
-        }
+        showAlternativeLogin: true
       });
     };
     document.body.appendChild(script);
