@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Вход через VK</title>
+    <script src="https://vk.com/js/api/openapi.js?169"></script>
+  </head>
+  <body>
+    <h2>Вход через VK One Tap</h2>
+    <div id="vk_auth"></div>
+
+    <script type="text/javascript">
+      window.vkAsyncInit = function () {
+        VK.init({
+          apiId: 53969710
+        });
+        VK.Widgets.Auth("vk_auth", {
+          authUrl: "https://pvp-chance.vercel.app/api/vk/callback"
+        });
+      };
+    </script>
+  </body>
+</html>
