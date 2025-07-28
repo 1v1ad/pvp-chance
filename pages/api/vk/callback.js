@@ -22,10 +22,10 @@ export default async function handler(req, res) {
 
     const { user_id } = data;
 
-    // ❗ Устанавливаем куку правильно: только Max-Age
-    res.setHeader('Set-Cookie', [
-      `vk_user_id=${user_id}; Max-Age=604800; Path=/; SameSite=Lax`
-    ]);
+    const cookie = `vk_user_id=${user_id}; Max-Age=604800; Path=/; SameSite=Lax`;
+    res.setHeader('Set-Cookie', cookie);
+
+    console.log('Set-Cookie:', cookie); // DEBUG
 
     return res.redirect(302, '/lobby');
   } catch (err) {
