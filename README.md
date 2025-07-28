@@ -1,3 +1,3 @@
 # PvP Chance
 
-Тестовая версия проекта.
+VK Login Demo Project
